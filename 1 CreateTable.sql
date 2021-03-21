@@ -1,4 +1,3 @@
---server
 clear screen;
 
 drop table Parent1;

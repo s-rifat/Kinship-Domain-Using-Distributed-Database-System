@@ -2,23 +2,13 @@ clear screen;
 SET SERVEROUTPUT ON;
 SET VERIFY OFF;
 
-BEGIN 
-    DBMS_OUTPUT.PUT_LINE('1 = GrandParent, 2 = Grandchildren, 3 = Brother, 4 = Sister, 5 = Uncle, 6 = Aunt');
-END;
-/
-
-ACCEPT Y CHAR PROMPT   "Enter Name = "
-ACCEPT X NUMBER PROMPT "Choose option = "
-DECLARE
+CREATE OR REPLACE FUNCTION IsInKB(S IN VARCHAR2)
+RETURN NUMBER
+IS
     bl number;
-    N number;
-	S Parent1.parentName%Type;
 	A Parent1.parentName%Type;
 	B Parent1.parentName%Type;
-	RIFAT EXCEPTION;
 BEGIN 
-	S := '&Y';
-	N := &X;
 	bl := 1;
 	FOR R IN (SELECT parentName, childName FROM Parent1 NATURAL JOIN Parent2@site1) LOOP
 	    A := R.parentName;
@@ -27,8 +17,26 @@ BEGIN
 			bl :=0;
 		end if;
 	end loop;
+	RETURN bl;
+END IsInKB;
+/
+
+BEGIN 
+    DBMS_OUTPUT.PUT_LINE('1 = GrandParent, 2 = Grandchildren, 3 = Brother, 4 = Sister, 5 = Uncle, 6 = Aunt');
+END;
+/
+
+ACCEPT Y CHAR PROMPT   "Enter Name = "
+ACCEPT X NUMBER PROMPT "Choose option = "
+DECLARE
+    N number;
+	S Parent1.parentName%Type;
+	RIFAT EXCEPTION;
+BEGIN 
+	S := '&Y';
+	N := &X;
 	
-	if bl = 1 then
+	if IsInKB(S) = 1 then
 		RAISE RIFAT;
 	end if;
 
